@@ -77,11 +77,11 @@ impl Mul for Residue {
     }
 }
 
-struct RingElem {
+struct Poly {
     coeffs: [Residue; DEGREE],
 }
 
-struct CrtElem {
+struct CrtPoly {
     values: [Residue; DEGREE],
 }
 
