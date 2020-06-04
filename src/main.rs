@@ -175,41 +175,41 @@ impl Mul<Residue> for i64 {
     }
 }
 
-struct CrtPoly([Residue; DEGREE]);
+struct ChremPoly([Residue; DEGREE]);
 
-impl Add for CrtPoly {
-    type Output = CrtPoly;
+impl Add for ChremPoly {
+    type Output = ChremPoly;
 
-    fn add(self, other: CrtPoly) -> CrtPoly {
+    fn add(self, other: ChremPoly) -> ChremPoly {
         let mut data = [Residue::zero(); DEGREE];
         for (res, a, b) in izip!(data.iter_mut(), self.0.iter(), other.0.iter()) {
             *res = *a + *b;
         }
-        CrtPoly(data)
+        ChremPoly(data)
     }
 }
 
-impl Sub for CrtPoly {
-    type Output = CrtPoly;
+impl Sub for ChremPoly {
+    type Output = ChremPoly;
 
-    fn sub(self, other: CrtPoly) -> CrtPoly {
+    fn sub(self, other: ChremPoly) -> ChremPoly {
         let mut data = [Residue::zero(); DEGREE];
         for (res, a, b) in izip!(data.iter_mut(), self.0.iter(), other.0.iter()) {
             *res = *a - *b;
         }
-        CrtPoly(data)
+        ChremPoly(data)
     }
 }
 
-impl Mul for CrtPoly {
-    type Output = CrtPoly;
+impl Mul for ChremPoly {
+    type Output = ChremPoly;
 
-    fn mul(self, other: CrtPoly) -> CrtPoly {
+    fn mul(self, other: ChremPoly) -> ChremPoly {
         let mut data = [Residue::zero(); DEGREE];
         for (res, a, b) in izip!(data.iter_mut(), self.0.iter(), other.0.iter()) {
             *res = *a * *b;
         }
-        CrtPoly(data)
+        ChremPoly(data)
     }
 }
 
@@ -219,7 +219,7 @@ impl Add for Poly {
     type Output = Poly;
 
     fn add(self, other: Poly) -> Poly {
-        Poly((CrtPoly(self.0) + CrtPoly(other.0)).0)
+        Poly((ChremPoly(self.0) + ChremPoly(other.0)).0)
     }
 }
 
@@ -227,7 +227,7 @@ impl Sub for Poly {
     type Output = Poly;
 
     fn sub(self, other: Poly) -> Poly {
-        Poly((CrtPoly(self.0) - CrtPoly(other.0)).0)
+        Poly((ChremPoly(self.0) - ChremPoly(other.0)).0)
     }
 }
 
