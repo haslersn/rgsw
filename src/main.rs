@@ -212,65 +212,105 @@ impl Mul<Residue> for i64 {
 
 struct ChremPoly([Residue; DEGREE]);
 
+impl AddAssign<&ChremPoly> for ChremPoly {
+    fn add_assign(&mut self, other: &ChremPoly) {
+        for (a, b) in self.0.iter_mut().zip(other.0.iter()) {
+            *a += b;
+        }
+    }
+}
+
 impl Add for ChremPoly {
     type Output = ChremPoly;
 
-    fn add(self, other: ChremPoly) -> ChremPoly {
-        let mut data = [Residue::zero(); DEGREE];
-        for (res, a, b) in izip!(data.iter_mut(), self.0.iter(), other.0.iter()) {
-            *res = *a + *b;
+    fn add(mut self, other: ChremPoly) -> ChremPoly {
+        self += &other;
+        self
+    }
+}
+
+impl SubAssign<&ChremPoly> for ChremPoly {
+    fn sub_assign(&mut self, other: &ChremPoly) {
+        for (a, b) in self.0.iter_mut().zip(other.0.iter()) {
+            *a -= b;
         }
-        ChremPoly(data)
     }
 }
 
 impl Sub for ChremPoly {
     type Output = ChremPoly;
 
-    fn sub(self, other: ChremPoly) -> ChremPoly {
-        let mut data = [Residue::zero(); DEGREE];
-        for (res, a, b) in izip!(data.iter_mut(), self.0.iter(), other.0.iter()) {
-            *res = *a - *b;
+    fn sub(mut self, other: ChremPoly) -> ChremPoly {
+        self -= &other;
+        self
+    }
+}
+
+impl MulAssign<&ChremPoly> for ChremPoly {
+    fn mul_assign(&mut self, other: &ChremPoly) {
+        for (a, b) in self.0.iter_mut().zip(other.0.iter()) {
+            *a *= b;
         }
-        ChremPoly(data)
     }
 }
 
 impl Mul for ChremPoly {
     type Output = ChremPoly;
 
-    fn mul(self, other: ChremPoly) -> ChremPoly {
-        let mut data = [Residue::zero(); DEGREE];
-        for (res, a, b) in izip!(data.iter_mut(), self.0.iter(), other.0.iter()) {
-            *res = *a * *b;
-        }
-        ChremPoly(data)
+    fn mul(mut self, other: ChremPoly) -> ChremPoly {
+        self *= &other;
+        self
     }
 }
 
 struct CoeffPoly([Residue; DEGREE]);
 
+impl AddAssign<&CoeffPoly> for CoeffPoly {
+    fn add_assign(&mut self, other: &CoeffPoly) {
+        for (a, b) in self.0.iter_mut().zip(other.0.iter()) {
+            *a += b;
+        }
+    }
+}
+
 impl Add for CoeffPoly {
     type Output = CoeffPoly;
 
-    fn add(self, other: CoeffPoly) -> CoeffPoly {
-        CoeffPoly((ChremPoly(self.0) + ChremPoly(other.0)).0)
+    fn add(mut self, other: CoeffPoly) -> CoeffPoly {
+        self += &other;
+        self
+    }
+}
+
+impl SubAssign<&CoeffPoly> for CoeffPoly {
+    fn sub_assign(&mut self, other: &CoeffPoly) {
+        for (a, b) in self.0.iter_mut().zip(other.0.iter()) {
+            *a -= b;
+        }
     }
 }
 
 impl Sub for CoeffPoly {
     type Output = CoeffPoly;
 
-    fn sub(self, other: CoeffPoly) -> CoeffPoly {
-        CoeffPoly((ChremPoly(self.0) - ChremPoly(other.0)).0)
+    fn sub(mut self, other: CoeffPoly) -> CoeffPoly {
+        self -= &other;
+        self
+    }
+}
+
+impl MulAssign<&CoeffPoly> for CoeffPoly {
+    fn mul_assign(&mut self, other: &CoeffPoly) {
+        // TODO: Implement this!
     }
 }
 
 impl Mul for CoeffPoly {
     type Output = CoeffPoly;
 
-    fn mul(self, other: CoeffPoly) -> CoeffPoly {
-        CoeffPoly([Residue::zero(); DEGREE]) // TODO: Implement this!
+    fn mul(mut self, other: CoeffPoly) -> CoeffPoly {
+        self *= &other;
+        self
     }
 }
 
