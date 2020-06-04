@@ -99,6 +99,10 @@ impl Residue {
     pub fn zero() -> Residue {
         Residue(U384::zero())
     }
+
+    pub fn one() -> Residue {
+        Residue(U384::one())
+    }
 }
 
 impl AddAssign<&Residue> for Residue {
