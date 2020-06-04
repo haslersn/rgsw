@@ -75,12 +75,12 @@ impl Poly for ChremPoly {
     }
 }
 
-pub struct CoeffPoly(pub [Residue; DEGREE]);
+pub struct PowerPoly(pub [Residue; DEGREE]);
 
-impl Neg for CoeffPoly {
-    type Output = CoeffPoly;
+impl Neg for PowerPoly {
+    type Output = PowerPoly;
 
-    fn neg(mut self) -> CoeffPoly {
+    fn neg(mut self) -> PowerPoly {
         for a in self.0.iter_mut() {
             *a = -*a;
         }
@@ -88,56 +88,56 @@ impl Neg for CoeffPoly {
     }
 }
 
-impl AddAssign<&CoeffPoly> for CoeffPoly {
-    fn add_assign(&mut self, other: &CoeffPoly) {
+impl AddAssign<&PowerPoly> for PowerPoly {
+    fn add_assign(&mut self, other: &PowerPoly) {
         for (a, b) in self.0.iter_mut().zip(other.0.iter()) {
             *a += b;
         }
     }
 }
 
-impl Add for CoeffPoly {
-    type Output = CoeffPoly;
+impl Add for PowerPoly {
+    type Output = PowerPoly;
 
-    fn add(mut self, other: CoeffPoly) -> CoeffPoly {
+    fn add(mut self, other: PowerPoly) -> PowerPoly {
         self += &other;
         self
     }
 }
 
-impl SubAssign<&CoeffPoly> for CoeffPoly {
-    fn sub_assign(&mut self, other: &CoeffPoly) {
+impl SubAssign<&PowerPoly> for PowerPoly {
+    fn sub_assign(&mut self, other: &PowerPoly) {
         for (a, b) in self.0.iter_mut().zip(other.0.iter()) {
             *a -= b;
         }
     }
 }
 
-impl Sub for CoeffPoly {
-    type Output = CoeffPoly;
+impl Sub for PowerPoly {
+    type Output = PowerPoly;
 
-    fn sub(mut self, other: CoeffPoly) -> CoeffPoly {
+    fn sub(mut self, other: PowerPoly) -> PowerPoly {
         self -= &other;
         self
     }
 }
 
-impl MulAssign<&CoeffPoly> for CoeffPoly {
-    fn mul_assign(&mut self, other: &CoeffPoly) {
+impl MulAssign<&PowerPoly> for PowerPoly {
+    fn mul_assign(&mut self, other: &PowerPoly) {
         // TODO: Implement this!
     }
 }
 
-impl Mul for CoeffPoly {
-    type Output = CoeffPoly;
+impl Mul for PowerPoly {
+    type Output = PowerPoly;
 
-    fn mul(mut self, other: CoeffPoly) -> CoeffPoly {
+    fn mul(mut self, other: PowerPoly) -> PowerPoly {
         self *= &other;
         self
     }
 }
 
-impl Poly for CoeffPoly {
+impl Poly for PowerPoly {
     fn eval(self, x: &Residue) -> Residue {
         let mut result = Residue::zero();
         for coeff in self.0.iter().rev() {
