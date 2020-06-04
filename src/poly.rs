@@ -1,6 +1,10 @@
 use crate::residue::*;
 use std::ops::{Add, AddAssign, Mul, MulAssign, Sub, SubAssign};
 
+trait Poly {
+    fn eval(self, x: &Residue) -> Residue;
+}
+
 pub struct ChremPoly(pub [Residue; DEGREE]);
 
 impl AddAssign<&ChremPoly> for ChremPoly {
@@ -54,6 +58,12 @@ impl Mul for ChremPoly {
     }
 }
 
+impl Poly for ChremPoly {
+    fn eval(self, x: &Residue) -> Residue {
+        Residue::zero() // TODO: Implement this!
+    }
+}
+
 pub struct CoeffPoly(pub [Residue; DEGREE]);
 
 impl AddAssign<&CoeffPoly> for CoeffPoly {
@@ -102,5 +112,16 @@ impl Mul for CoeffPoly {
     fn mul(mut self, other: CoeffPoly) -> CoeffPoly {
         self *= &other;
         self
+    }
+}
+
+impl Poly for CoeffPoly {
+    fn eval(self, x: &Residue) -> Residue {
+        let mut result = Residue::zero();
+        for coeff in self.0.iter().rev() {
+            result *= x;
+            result += coeff
+        }
+        result
     }
 }
