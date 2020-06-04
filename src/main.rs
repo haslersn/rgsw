@@ -1,3 +1,4 @@
+use std::convert::{TryFrom, TryInto};
 use std::ops::{Add, Mul, Sub};
 
 #[macro_use]
@@ -13,6 +14,75 @@ construct_uint! {
 
 construct_uint! {
     pub struct U768(12);
+}
+
+impl From<U384> for U448 {
+    fn from(other: U384) -> U448 {
+        let mut data = [0; 7];
+        data[..6].clone_from_slice(other.0.as_ref());
+        U448(data)
+    }
+}
+
+impl TryFrom<U448> for U384 {
+    type Error = &'static str;
+
+    fn try_from(other: U448) -> Result<U384, &'static str> {
+        let data = other.as_ref();
+        if data[6..].iter().all(|&x| x == 0) {
+            let mut new_data = [0; 6];
+            new_data.clone_from_slice(&data[..6]);
+            Ok(U384(new_data))
+        } else {
+            Err("Overflow during conversion from U448 to U384.")
+        }
+    }
+}
+
+impl From<U384> for U768 {
+    fn from(other: U384) -> U768 {
+        let mut data = [0; 12];
+        data[..6].clone_from_slice(other.0.as_ref());
+        U768(data)
+    }
+}
+
+impl TryFrom<U768> for U384 {
+    type Error = &'static str;
+
+    fn try_from(other: U768) -> Result<U384, &'static str> {
+        let data = other.as_ref();
+        if data[6..].iter().all(|&x| x == 0) {
+            let mut new_data = [0; 6];
+            new_data.clone_from_slice(&data[..6]);
+            Ok(U384(new_data))
+        } else {
+            Err("Overflow during conversion from U768 to U384.")
+        }
+    }
+}
+
+impl From<U448> for U768 {
+    fn from(other: U448) -> Self {
+        let mut data = [0; 12];
+        data[..7].clone_from_slice(other.0.as_ref());
+        Self(data)
+    }
+}
+
+impl TryFrom<U768> for U448 {
+    type Error = &'static str;
+
+    fn try_from(other: U768) -> Result<U448, &'static str> {
+        let data = other.as_ref();
+        if data[7..].iter().all(|&x| x == 0) {
+            let mut new_data = [0; 7];
+            new_data.clone_from_slice(&data[..7]);
+            Ok(U448(new_data))
+        } else {
+            Err("Overflow during conversion from U768 to U448.")
+        }
+    }
 }
 
 const DEGREE: usize = 24320;
@@ -32,15 +102,9 @@ impl Add for Residue {
     type Output = Residue;
 
     fn add(self, other: Residue) -> Residue {
-        let mut a = [0; 7];
-        let mut b = [0; 7];
-        let mut q = [0; 7];
-        a[..6].clone_from_slice(self.0.as_ref());
-        b[..6].clone_from_slice(other.0.as_ref());
-        q[..6].clone_from_slice(MODULUS.as_ref());
-        let mut r = [0; 6];
-        r.clone_from_slice(&((U448(a) + U448(b)) % U448(q)).as_ref()[..6]);
-        Residue(U384(r))
+        let q = Into::<U448>::into(MODULUS);
+        let sum = Into::<U448>::into(self.0) + Into::<U448>::into(other.0);
+        Residue((sum % q).try_into().unwrap())
     }
 }
 
@@ -48,16 +112,9 @@ impl Sub for Residue {
     type Output = Residue;
 
     fn sub(self, other: Residue) -> Residue {
-        let mut a = [0; 7];
-        let mut b = [0; 7];
-        let mut q = [0; 7];
-        a[..6].clone_from_slice(self.0.as_ref());
-        b[..6].clone_from_slice(other.0.as_ref());
-        q[..6].clone_from_slice(MODULUS.as_ref());
-        let mut r = [0; 6];
-        // First add the modulus q, so that intermediate values are positive.
-        r.clone_from_slice(&((U448(q) + U448(a) - U448(b)) % U448(q)).as_ref()[..6]);
-        Residue(U384(r))
+        let q = Into::<U448>::into(MODULUS);
+        let diff = q + Into::<U448>::into(self.0) - Into::<U448>::into(other.0);
+        Residue((diff % q).try_into().unwrap())
     }
 }
 
@@ -65,15 +122,9 @@ impl Mul for Residue {
     type Output = Residue;
 
     fn mul(self, other: Residue) -> Residue {
-        let mut a = [0; 12];
-        let mut b = [0; 12];
-        let mut q = [0; 12];
-        a[..6].clone_from_slice(self.0.as_ref());
-        b[..6].clone_from_slice(other.0.as_ref());
-        q[..6].clone_from_slice(MODULUS.as_ref());
-        let mut r = [0; 6];
-        r.clone_from_slice(&((U768(a) * U768(b)) % U768(q)).as_ref()[..6]);
-        Residue(U384(r))
+        let q = Into::<U768>::into(MODULUS);
+        let prod = Into::<U768>::into(self.0) * Into::<U768>::into(other.0);
+        Residue((prod % q).try_into().unwrap())
     }
 }
 
