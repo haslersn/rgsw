@@ -1,6 +1,6 @@
 use std::convert::{TryFrom, TryInto};
 use itertools::izip;
-use std::ops::{Add, Mul, Sub};
+use std::ops::{Add, AddAssign, Mul, MulAssign, Sub, SubAssign};
 
 #[macro_use]
 extern crate uint;
@@ -105,43 +105,71 @@ impl Residue {
     }
 }
 
+impl AddAssign<&Residue> for Residue {
+    fn add_assign(&mut self, other: &Residue) {
+        let q = Into::<U448>::into(MODULUS);
+        let sum = Into::<U448>::into(self.0) + Into::<U448>::into(other.0);
+        self.0 = (sum % q).try_into().unwrap();
+    }
+}
+
 impl Add for Residue {
     type Output = Residue;
 
-    fn add(self, other: Residue) -> Residue {
+    fn add(mut self, other: Residue) -> Residue {
+        self += &other;
+        self
+    }
+}
+
+impl SubAssign<&Residue> for Residue {
+    fn sub_assign(&mut self, other: &Residue) {
         let q = Into::<U448>::into(MODULUS);
-        let sum = Into::<U448>::into(self.0) + Into::<U448>::into(other.0);
-        Residue((sum % q).try_into().unwrap())
+        let diff = q + Into::<U448>::into(self.0) - Into::<U448>::into(other.0);
+        self.0 = (diff % q).try_into().unwrap();
     }
 }
 
 impl Sub for Residue {
     type Output = Residue;
 
-    fn sub(self, other: Residue) -> Residue {
-        let q = Into::<U448>::into(MODULUS);
-        let diff = q + Into::<U448>::into(self.0) - Into::<U448>::into(other.0);
-        Residue((diff % q).try_into().unwrap())
+    fn sub(mut self, other: Residue) -> Residue {
+        self -= &other;
+        self
+    }
+}
+
+impl MulAssign<&Residue> for Residue {
+    fn mul_assign(&mut self, other: &Residue) {
+        let q = Into::<U768>::into(MODULUS);
+        let prod = Into::<U768>::into(self.0) * Into::<U768>::into(other.0);
+        self.0 = (prod % q).try_into().unwrap();
     }
 }
 
 impl Mul for Residue {
     type Output = Residue;
 
-    fn mul(self, other: Residue) -> Residue {
-        let q = Into::<U768>::into(MODULUS);
-        let prod = Into::<U768>::into(self.0) * Into::<U768>::into(other.0);
-        Residue((prod % q).try_into().unwrap())
+    fn mul(mut self, other: Residue) -> Residue {
+        self *= &other;
+        self
+    }
+}
+
+impl MulAssign<u64> for Residue {
+    fn mul_assign(&mut self, other: u64) {
+        let q = Into::<U448>::into(MODULUS);
+        let prod = Into::<U448>::into(self.0) * other;
+        self.0 = (prod % q).try_into().unwrap();
     }
 }
 
 impl Mul<u64> for Residue {
     type Output = Residue;
 
-    fn mul(self, other: u64) -> Residue {
-        let q = Into::<U448>::into(MODULUS);
-        let prod = Into::<U448>::into(self.0) * other;
-        Residue((prod % q).try_into().unwrap())
+    fn mul(mut self, other: u64) -> Residue {
+        self *= other;
+        self
     }
 }
 
@@ -153,17 +181,24 @@ impl Mul<Residue> for u64 {
     }
 }
 
-impl Mul<i64> for Residue {
-    type Output = Residue;
-
-    fn mul(self, other: i64) -> Residue {
+impl MulAssign<i64> for Residue {
+    fn mul_assign(&mut self, other: i64) {
         let q = Into::<U448>::into(MODULUS);
         let prod = if other >= 0 {
             Into::<U448>::into(self.0) * other
         } else {
             (q - Into::<U448>::into(self.0)) * ((-other) as u64)
         };
-        Residue((prod % q).try_into().unwrap())
+        self.0 = (prod % q).try_into().unwrap();
+    }
+}
+
+impl Mul<i64> for Residue {
+    type Output = Residue;
+
+    fn mul(mut self, other: i64) -> Residue {
+        self *= other;
+        self
     }
 }
 
