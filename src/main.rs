@@ -128,6 +128,46 @@ impl Mul for Residue {
     }
 }
 
+impl Mul<u64> for Residue {
+    type Output = Residue;
+
+    fn mul(self, other: u64) -> Residue {
+        let q = Into::<U448>::into(MODULUS);
+        let prod = Into::<U448>::into(self.0) * other;
+        Residue((prod % q).try_into().unwrap())
+    }
+}
+
+impl Mul<Residue> for u64 {
+    type Output = Residue;
+
+    fn mul(self, other: Residue) -> Residue {
+        other * self
+    }
+}
+
+impl Mul<i64> for Residue {
+    type Output = Residue;
+
+    fn mul(self, other: i64) -> Residue {
+        let q = Into::<U448>::into(MODULUS);
+        let prod = if other >= 0 {
+            Into::<U448>::into(self.0) * other
+        } else {
+            (q - Into::<U448>::into(self.0)) * ((-other) as u64)
+        };
+        Residue((prod % q).try_into().unwrap())
+    }
+}
+
+impl Mul<Residue> for i64 {
+    type Output = Residue;
+
+    fn mul(self, other: Residue) -> Residue {
+        other * self
+    }
+}
+
 struct Poly {
     coeffs: [Residue; DEGREE],
 }
@@ -138,7 +178,7 @@ struct CrtPoly {
 
 fn main() {
     let one = Residue(U384::one());
-    let big = one.clone() + one;
+    let big = 2 as u64 * one.clone();
     let big = big.clone() * big;
     let big = big.clone() * big;
     let big = big.clone() * big;
