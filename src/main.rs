@@ -213,29 +213,29 @@ impl Mul for ChremPoly {
     }
 }
 
-struct Poly([Residue; DEGREE]);
+struct CoeffPoly([Residue; DEGREE]);
 
-impl Add for Poly {
-    type Output = Poly;
+impl Add for CoeffPoly {
+    type Output = CoeffPoly;
 
-    fn add(self, other: Poly) -> Poly {
-        Poly((ChremPoly(self.0) + ChremPoly(other.0)).0)
+    fn add(self, other: CoeffPoly) -> CoeffPoly {
+        CoeffPoly((ChremPoly(self.0) + ChremPoly(other.0)).0)
     }
 }
 
-impl Sub for Poly {
-    type Output = Poly;
+impl Sub for CoeffPoly {
+    type Output = CoeffPoly;
 
-    fn sub(self, other: Poly) -> Poly {
-        Poly((ChremPoly(self.0) - ChremPoly(other.0)).0)
+    fn sub(self, other: CoeffPoly) -> CoeffPoly {
+        CoeffPoly((ChremPoly(self.0) - ChremPoly(other.0)).0)
     }
 }
 
-impl Mul for Poly {
-    type Output = Poly;
+impl Mul for CoeffPoly {
+    type Output = CoeffPoly;
 
-    fn mul(self, other: Poly) -> Poly {
-        Poly([Residue::zero(); DEGREE]) // TODO: Implement this!
+    fn mul(self, other: CoeffPoly) -> CoeffPoly {
+        CoeffPoly([Residue::zero(); DEGREE]) // TODO: Implement this!
     }
 }
 
