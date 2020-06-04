@@ -1,4 +1,4 @@
-use std::ops::{Add, Mul};
+use std::ops::{Add, Mul, Sub};
 
 #[macro_use]
 extern crate uint;
@@ -40,6 +40,23 @@ impl Add for Residue {
         q[..6].clone_from_slice(MODULUS.as_ref());
         let mut r = [0; 6];
         r.clone_from_slice(&((U448(a) + U448(b)) % U448(q)).as_ref()[..6]);
+        Residue(U384(r))
+    }
+}
+
+impl Sub for Residue {
+    type Output = Residue;
+
+    fn sub(self, other: Residue) -> Residue {
+        let mut a = [0; 7];
+        let mut b = [0; 7];
+        let mut q = [0; 7];
+        a[..6].clone_from_slice(self.0.as_ref());
+        b[..6].clone_from_slice(other.0.as_ref());
+        q[..6].clone_from_slice(MODULUS.as_ref());
+        let mut r = [0; 6];
+        // First add the modulus q, so that intermediate values are positive.
+        r.clone_from_slice(&((U448(q) + U448(a) - U448(b)) % U448(q)).as_ref()[..6]);
         Residue(U384(r))
     }
 }
