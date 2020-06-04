@@ -103,6 +103,18 @@ impl Residue {
     pub fn one() -> Residue {
         Residue(U384::one())
     }
+
+    pub fn from_u64(x: u64) -> Residue {
+        Residue(U384([x, 0, 0, 0, 0, 0]))
+    }
+
+    pub fn from_i64(x: i64) -> Residue {
+        if x >= 0 {
+            Residue(U384([x as u64, 0, 0, 0, 0, 0]))
+        } else {
+            Residue(U384([-x as u64, 0, 0, 0, 0, 0])) * (-1) as i64
+        }
+    }
 }
 
 impl AddAssign<&Residue> for Residue {
