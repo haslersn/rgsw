@@ -1,5 +1,5 @@
 use std::convert::{TryFrom, TryInto};
-use std::ops::{Add, AddAssign, Mul, MulAssign, Sub, SubAssign};
+use std::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 construct_uint! {
     pub struct U384(6); // 6 x 64-bit word
@@ -112,8 +112,17 @@ impl Residue {
         if x >= 0 {
             Residue(U384([x as u64, 0, 0, 0, 0, 0]))
         } else {
-            Residue(U384([-x as u64, 0, 0, 0, 0, 0])) * (-1) as i64
+            -Residue(U384([-x as u64, 0, 0, 0, 0, 0]))
         }
+    }
+}
+
+impl Neg for Residue {
+    type Output = Residue;
+
+    fn neg(mut self) -> Residue {
+        self.0 = MODULUS - self.0;
+        self
     }
 }
 
