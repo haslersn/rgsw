@@ -95,8 +95,14 @@ const MODULUS: U384 = U384([
     0xFFFFFFFFFFFFFFFF,
 ]); // 2^(384) − 1081343
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 struct Residue(U384);
+
+impl Residue {
+    fn zero() -> Residue {
+        Residue(U384::zero())
+    }
+}
 
 impl Add for Residue {
     type Output = Residue;
@@ -178,15 +184,15 @@ struct CrtPoly {
 
 fn main() {
     let one = Residue(U384::one());
-    let big = 2 as u64 * one.clone();
-    let big = big.clone() * big;
-    let big = big.clone() * big;
-    let big = big.clone() * big;
-    let big = big.clone() * big;
-    let big = big.clone() * big;
-    let big = big.clone() * big;
-    let big = big.clone() * big;
-    let big = big.clone() * big;
-    let big = big.clone() * big; // 2^512 mod q
+    let big = 2 as u64 * one;
+    let big = big * big;
+    let big = big * big;
+    let big = big * big;
+    let big = big * big;
+    let big = big * big;
+    let big = big * big;
+    let big = big * big;
+    let big = big * big;
+    let big = big * big; // 2^512 mod q
     println!("Hello, world! {:?}", big);
 }
