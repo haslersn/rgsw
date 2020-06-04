@@ -1,4 +1,5 @@
 use std::convert::{TryFrom, TryInto};
+use itertools::izip;
 use std::ops::{Add, Mul, Sub};
 
 #[macro_use]
@@ -174,12 +175,68 @@ impl Mul<Residue> for i64 {
     }
 }
 
-struct Poly {
-    coeffs: [Residue; DEGREE],
+struct CrtPoly([Residue; DEGREE]);
+
+impl Add for CrtPoly {
+    type Output = CrtPoly;
+
+    fn add(self, other: CrtPoly) -> CrtPoly {
+        let mut data = [Residue::zero(); DEGREE];
+        for (res, a, b) in izip!(data.iter_mut(), self.0.iter(), other.0.iter()) {
+            *res = *a + *b;
+        }
+        CrtPoly(data)
+    }
 }
 
-struct CrtPoly {
-    values: [Residue; DEGREE],
+impl Sub for CrtPoly {
+    type Output = CrtPoly;
+
+    fn sub(self, other: CrtPoly) -> CrtPoly {
+        let mut data = [Residue::zero(); DEGREE];
+        for (res, a, b) in izip!(data.iter_mut(), self.0.iter(), other.0.iter()) {
+            *res = *a - *b;
+        }
+        CrtPoly(data)
+    }
+}
+
+impl Mul for CrtPoly {
+    type Output = CrtPoly;
+
+    fn mul(self, other: CrtPoly) -> CrtPoly {
+        let mut data = [Residue::zero(); DEGREE];
+        for (res, a, b) in izip!(data.iter_mut(), self.0.iter(), other.0.iter()) {
+            *res = *a * *b;
+        }
+        CrtPoly(data)
+    }
+}
+
+struct Poly([Residue; DEGREE]);
+
+impl Add for Poly {
+    type Output = Poly;
+
+    fn add(self, other: Poly) -> Poly {
+        Poly((CrtPoly(self.0) + CrtPoly(other.0)).0)
+    }
+}
+
+impl Sub for Poly {
+    type Output = Poly;
+
+    fn sub(self, other: Poly) -> Poly {
+        Poly((CrtPoly(self.0) - CrtPoly(other.0)).0)
+    }
+}
+
+impl Mul for Poly {
+    type Output = Poly;
+
+    fn mul(self, other: Poly) -> Poly {
+        Poly([Residue::zero(); DEGREE]) // TODO: Implement this!
+    }
 }
 
 fn main() {
