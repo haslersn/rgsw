@@ -3,6 +3,7 @@ extern crate uint;
 
 mod poly;
 mod residue;
+mod test;
 
 use crate::residue::*;
 

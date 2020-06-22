@@ -1,3 +1,5 @@
+use rand::distributions::{Distribution, Standard};
+use rand::Rng;
 use std::convert::{TryFrom, TryInto};
 use std::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
@@ -269,5 +271,18 @@ impl Mul<Residue> for i64 {
 
     fn mul(self, other: Residue) -> Residue {
         other * self
+    }
+}
+
+impl Distribution<Residue> for Standard {
+    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Residue {
+        Residue(U384([
+            rng.gen_range(0, 0xFFFFFFFFFFEF8001),
+            rng.gen(),
+            rng.gen(),
+            rng.gen(),
+            rng.gen(),
+            rng.gen(),
+        ]))
     }
 }
