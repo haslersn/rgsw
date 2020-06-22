@@ -5,7 +5,14 @@ trait Poly {
     fn eval(self, x: &Residue) -> Residue;
 }
 
+#[derive(Clone)]
 pub struct ChremPoly(pub [Residue; DEGREE]);
+
+impl PartialEq for ChremPoly {
+    fn eq(&self, other: &Self) -> bool {
+        self.0.iter().zip(other.0.iter()).all(|(a, b)| a == b)
+    }
+}
 
 impl Neg for ChremPoly {
     type Output = ChremPoly;
@@ -69,7 +76,14 @@ impl Mul for ChremPoly {
     }
 }
 
+#[derive(Clone)]
 pub struct PowerPoly(pub [Residue; DEGREE]);
+
+impl PartialEq for PowerPoly {
+    fn eq(&self, other: &Self) -> bool {
+        self.0.iter().zip(other.0.iter()).all(|(a, b)| a == b)
+    }
+}
 
 impl Neg for PowerPoly {
     type Output = PowerPoly;
