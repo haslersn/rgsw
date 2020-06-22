@@ -69,12 +69,6 @@ impl Mul for ChremPoly {
     }
 }
 
-impl Poly for ChremPoly {
-    fn eval(self, x: &Residue) -> Residue {
-        Residue::zero() // TODO: Implement this!
-    }
-}
-
 pub struct PowerPoly(pub [Residue; DEGREE]);
 
 impl Neg for PowerPoly {
@@ -118,21 +112,6 @@ impl Sub for PowerPoly {
 
     fn sub(mut self, other: PowerPoly) -> PowerPoly {
         self -= &other;
-        self
-    }
-}
-
-impl MulAssign<&PowerPoly> for PowerPoly {
-    fn mul_assign(&mut self, other: &PowerPoly) {
-        // TODO: Implement this!
-    }
-}
-
-impl Mul for PowerPoly {
-    type Output = PowerPoly;
-
-    fn mul(mut self, other: PowerPoly) -> PowerPoly {
-        self *= &other;
         self
     }
 }
