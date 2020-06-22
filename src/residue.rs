@@ -126,6 +126,18 @@ impl Residue {
             -Residue(U384([-x as u64, 0, 0, 0, 0, 0]))
         }
     }
+
+    pub fn pow(mut self, mut exponent: u32) -> Residue {
+        let mut result = Residue::one();
+        while exponent > 0 {
+            if exponent % 2 == 1 {
+                result *= &self;
+            }
+            self = self * self;
+            exponent /= 2;
+        }
+        result
+    }
 }
 
 impl Neg for Residue {
