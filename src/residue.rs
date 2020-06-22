@@ -82,7 +82,9 @@ impl TryFrom<U768> for U448 {
     }
 }
 
-pub const DEGREE: usize = 24320;
+pub const DEGREE: usize = 16384;
+pub const INDEX_BASE: usize = 2;
+pub const INDEX_POWER: u32 = 15;
 pub const MODULUS: U384 = U384([
     0xFFFFFFFFFFEF8001,
     0xFFFFFFFFFFFFFFFF,
@@ -91,6 +93,15 @@ pub const MODULUS: U384 = U384([
     0xFFFFFFFFFFFFFFFF,
     0xFFFFFFFFFFFFFFFF,
 ]); // 2^(384) − 1081343
+pub const INDEX_TH_ROOT: Residue = Residue(U384([
+    0xC65EA8DC3E81B1F8,
+    0x187343D949A162D5,
+    0xF74AC8D88DE2DC56,
+    0x4225431217768CF2,
+    0x9C79D95C1EF48D17,
+    0x0001C062055D83EA,
+])); // 1053046320810374670051386479886365060104392590871858199730685648701498648418052922079079421152377431379245380088
+     // which is a primitive 32768th root of unity mod MODULUS.
 
 #[derive(Clone, Copy, Debug)]
 pub struct Residue(pub U384);
