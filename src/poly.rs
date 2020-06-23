@@ -1,7 +1,7 @@
 use crate::residue::*;
 use std::ops::{AddAssign, MulAssign, Neg, SubAssign};
 
-trait Poly {
+trait EvalPoly {
     fn eval(self, x: Residue) -> Residue;
 }
 
@@ -85,7 +85,7 @@ impl SubAssign<&PowerPoly> for PowerPoly {
     }
 }
 
-impl Poly for PowerPoly {
+impl EvalPoly for PowerPoly {
     fn eval(self, x: Residue) -> Residue {
         let mut result = Residue::zero();
         for coeff in self.0.iter().rev() {
