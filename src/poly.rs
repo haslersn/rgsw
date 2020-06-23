@@ -1,12 +1,12 @@
 use crate::residue::*;
-use std::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+use std::ops::{AddAssign, MulAssign, Neg, SubAssign};
 
 trait Poly {
-    fn eval(self, x: &Residue) -> Residue;
+    fn eval(self, x: Residue) -> Residue;
 }
 
 #[derive(Clone)]
-pub struct ChremPoly(pub [Residue; DEGREE]);
+pub struct ChremPoly(pub Box<[Residue; DEGREE]>);
 
 impl PartialEq for ChremPoly {
     fn eq(&self, other: &Self) -> bool {
@@ -28,56 +28,29 @@ impl Neg for ChremPoly {
 impl AddAssign<&ChremPoly> for ChremPoly {
     fn add_assign(&mut self, other: &ChremPoly) {
         for (a, b) in self.0.iter_mut().zip(other.0.iter()) {
-            *a += b;
+            *a += *b;
         }
-    }
-}
-
-impl Add for ChremPoly {
-    type Output = ChremPoly;
-
-    fn add(mut self, other: ChremPoly) -> ChremPoly {
-        self += &other;
-        self
     }
 }
 
 impl SubAssign<&ChremPoly> for ChremPoly {
     fn sub_assign(&mut self, other: &ChremPoly) {
         for (a, b) in self.0.iter_mut().zip(other.0.iter()) {
-            *a -= b;
+            *a -= *b;
         }
-    }
-}
-
-impl Sub for ChremPoly {
-    type Output = ChremPoly;
-
-    fn sub(mut self, other: ChremPoly) -> ChremPoly {
-        self -= &other;
-        self
     }
 }
 
 impl MulAssign<&ChremPoly> for ChremPoly {
     fn mul_assign(&mut self, other: &ChremPoly) {
         for (a, b) in self.0.iter_mut().zip(other.0.iter()) {
-            *a *= b;
+            *a *= *b;
         }
     }
 }
 
-impl Mul for ChremPoly {
-    type Output = ChremPoly;
-
-    fn mul(mut self, other: ChremPoly) -> ChremPoly {
-        self *= &other;
-        self
-    }
-}
-
 #[derive(Clone)]
-pub struct PowerPoly(pub [Residue; DEGREE]);
+pub struct PowerPoly(pub Box<[Residue; DEGREE]>);
 
 impl PartialEq for PowerPoly {
     fn eq(&self, other: &Self) -> bool {
@@ -99,43 +72,25 @@ impl Neg for PowerPoly {
 impl AddAssign<&PowerPoly> for PowerPoly {
     fn add_assign(&mut self, other: &PowerPoly) {
         for (a, b) in self.0.iter_mut().zip(other.0.iter()) {
-            *a += b;
+            *a += *b;
         }
-    }
-}
-
-impl Add for PowerPoly {
-    type Output = PowerPoly;
-
-    fn add(mut self, other: PowerPoly) -> PowerPoly {
-        self += &other;
-        self
     }
 }
 
 impl SubAssign<&PowerPoly> for PowerPoly {
     fn sub_assign(&mut self, other: &PowerPoly) {
         for (a, b) in self.0.iter_mut().zip(other.0.iter()) {
-            *a -= b;
+            *a -= *b;
         }
     }
 }
 
-impl Sub for PowerPoly {
-    type Output = PowerPoly;
-
-    fn sub(mut self, other: PowerPoly) -> PowerPoly {
-        self -= &other;
-        self
-    }
-}
-
 impl Poly for PowerPoly {
-    fn eval(self, x: &Residue) -> Residue {
+    fn eval(self, x: Residue) -> Residue {
         let mut result = Residue::zero();
         for coeff in self.0.iter().rev() {
             result *= x;
-            result += coeff
+            result += *coeff
         }
         result
     }
@@ -238,11 +193,11 @@ fn dft(p: usize, power: u32, data: &mut [Residue], extra_buffer: &mut [Residue])
             // DFT_p \otimes I_{[m']}
             for (j0_in, input) in data.iter().skip(j1).step_by(m_).enumerate() {
                 // TODO: Precompute the matrix with (i,j)th entry INDEX_TH_ROOT.pow(i*j).
-                *output += &(*input * INDEX_TH_ROOT.pow((j0_out * j0_in) as u32));
+                *output += *input * INDEX_TH_ROOT.pow((j0_out * j0_in) as u32);
             }
             // T_m
             if j1 > 0 && j0_out > 0 {
-                *output *= &INDEX_TH_ROOT.pow((j0_out * j1) as u32);
+                *output *= INDEX_TH_ROOT.pow((j0_out * j1) as u32);
             }
         }
     }
@@ -275,11 +230,11 @@ fn crt(p: usize, power: u32, data: &mut [Residue], extra_buffer: &mut [Residue])
             // CRT_p \otimes I_{[m']}
             for (j0_in, input) in data.iter().skip(j1).step_by(m_).enumerate() {
                 // TODO: Precompute the matrix with (i,j)th entry INDEX_TH_ROOT.pow(i*j).
-                *output += &(*input * INDEX_TH_ROOT.pow(((j0_out + 1) * j0_in) as u32));
+                *output += *input * INDEX_TH_ROOT.pow(((j0_out + 1) * j0_in) as u32);
             }
             // \hat T_m
             if j1 > 0 {
-                *output *= &INDEX_TH_ROOT.pow(((j0_out + 1) * j1) as u32);
+                *output *= INDEX_TH_ROOT.pow(((j0_out + 1) * j1) as u32);
             }
         }
     }
@@ -330,7 +285,7 @@ fn inv_dft(p: usize, power: u32, data: &mut [Residue], extra_buffer: &mut [Resid
                 .enumerate()
                 .skip(1)
             {
-                *input *= &INV_INDEX_TH_ROOT.pow((j0_in * j1) as u32);
+                *input *= INV_INDEX_TH_ROOT.pow((j0_in * j1) as u32);
             }
         }
         // DFT_p^{-1} \otimes I_{[m']}
@@ -339,14 +294,14 @@ fn inv_dft(p: usize, power: u32, data: &mut [Residue], extra_buffer: &mut [Resid
             for (j0_in, input) in extra_buffer.iter().skip(j1).step_by(m_).enumerate() {
                 // TODO: This is a HACK(!) for p = 2
                 if j0_out + j0_in == 1 {
-                    *output -= input;
+                    *output -= *input;
                 } else if j0_out + j0_in == 0 {
-                    *output += &(*input * INDEX_TH_ROOT);
+                    *output += *input * INDEX_TH_ROOT;
                 } else {
-                    *output += input;
+                    *output += *input;
                 }
             }
-            *output *= &INV_INDEX_TH_ROOT_MINUS_ONE;
+            *output *= INV_INDEX_TH_ROOT_MINUS_ONE;
         }
     }
 }
@@ -376,7 +331,7 @@ fn inv_crt(p: usize, power: u32, data: &mut [Residue], extra_buffer: &mut [Resid
         // \hat T_m^{-1}
         if j1 > 0 {
             for (j0_in, input) in extra_buffer.iter_mut().skip(j1).step_by(m_).enumerate() {
-                *input *= &INV_INDEX_TH_ROOT.pow(((j0_in + 1) * j1) as u32);
+                *input *= INV_INDEX_TH_ROOT.pow(((j0_in + 1) * j1) as u32);
             }
         }
         // CRT_p^{-1} \otimes I_{[m']}
@@ -384,7 +339,7 @@ fn inv_crt(p: usize, power: u32, data: &mut [Residue], extra_buffer: &mut [Resid
             *output = Residue::zero();
             for (j0_in, input) in extra_buffer.iter().skip(j1).step_by(m_).enumerate() {
                 // TODO: This is a HACK(!) for p = 2
-                *output += input;
+                *output += *input;
             }
         }
     }
@@ -393,7 +348,7 @@ fn inv_crt(p: usize, power: u32, data: &mut [Residue], extra_buffer: &mut [Resid
 impl From<PowerPoly> for ChremPoly {
     fn from(mut other: PowerPoly) -> ChremPoly {
         let mut result = ChremPoly(other.0.clone());
-        crt(INDEX_BASE, INDEX_POWER, &mut result.0, &mut other.0);
+        crt(INDEX_BASE, INDEX_POWER, result.0.as_mut(), other.0.as_mut());
         result
     }
 }
@@ -401,7 +356,7 @@ impl From<PowerPoly> for ChremPoly {
 impl From<ChremPoly> for PowerPoly {
     fn from(mut other: ChremPoly) -> PowerPoly {
         let mut result = PowerPoly(other.0.clone());
-        inv_crt(INDEX_BASE, INDEX_POWER, &mut result.0, &mut other.0);
+        inv_crt(INDEX_BASE, INDEX_POWER, result.0.as_mut(), other.0.as_mut());
         result
     }
 }

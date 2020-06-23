@@ -151,9 +151,9 @@ impl Residue {
         let mut result = Residue::one();
         while exponent > 0 {
             if exponent % 2 == 1 {
-                result *= &self;
+                result *= self;
             }
-            self = self * self;
+            self *= self;
             exponent /= 2;
         }
         result
@@ -169,8 +169,8 @@ impl Neg for Residue {
     }
 }
 
-impl AddAssign<&Residue> for Residue {
-    fn add_assign(&mut self, other: &Residue) {
+impl AddAssign for Residue {
+    fn add_assign(&mut self, other: Residue) {
         let q = Into::<U448>::into(MODULUS);
         let sum = Into::<U448>::into(self.0) + Into::<U448>::into(other.0);
         self.0 = (sum % q).try_into().unwrap();
@@ -181,13 +181,13 @@ impl Add for Residue {
     type Output = Residue;
 
     fn add(mut self, other: Residue) -> Residue {
-        self += &other;
+        self += other;
         self
     }
 }
 
-impl SubAssign<&Residue> for Residue {
-    fn sub_assign(&mut self, other: &Residue) {
+impl SubAssign for Residue {
+    fn sub_assign(&mut self, other: Residue) {
         let q = Into::<U448>::into(MODULUS);
         let diff = q + Into::<U448>::into(self.0) - Into::<U448>::into(other.0);
         self.0 = (diff % q).try_into().unwrap();
@@ -198,13 +198,13 @@ impl Sub for Residue {
     type Output = Residue;
 
     fn sub(mut self, other: Residue) -> Residue {
-        self -= &other;
+        self -= other;
         self
     }
 }
 
-impl MulAssign<&Residue> for Residue {
-    fn mul_assign(&mut self, other: &Residue) {
+impl MulAssign for Residue {
+    fn mul_assign(&mut self, other: Residue) {
         let q = Into::<U768>::into(MODULUS);
         let prod = Into::<U768>::into(self.0) * Into::<U768>::into(other.0);
         self.0 = (prod % q).try_into().unwrap();
@@ -215,7 +215,7 @@ impl Mul for Residue {
     type Output = Residue;
 
     fn mul(mut self, other: Residue) -> Residue {
-        self *= &other;
+        self *= other;
         self
     }
 }
