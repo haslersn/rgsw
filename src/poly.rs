@@ -1,4 +1,5 @@
 use crate::residue::*;
+use std::fmt::{Debug, Formatter};
 use std::ops::{AddAssign, MulAssign, Neg, SubAssign};
 
 trait EvalPoly {
@@ -49,6 +50,17 @@ impl MulAssign<&ChremPoly> for ChremPoly {
     }
 }
 
+impl Debug for ChremPoly {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let mut builder = f.debug_list();
+        for residue in self.0.iter() {
+            builder.entry(residue);
+        }
+        builder.finish()?;
+        Ok(())
+    }
+}
+
 #[derive(Clone)]
 pub struct PowerPoly(pub Box<[Residue; DEGREE]>);
 
@@ -93,6 +105,17 @@ impl EvalPoly for PowerPoly {
             result += *coeff
         }
         result
+    }
+}
+
+impl Debug for PowerPoly {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let mut builder = f.debug_list();
+        for residue in self.0.iter() {
+            builder.entry(residue);
+        }
+        builder.finish()?;
+        Ok(())
     }
 }
 
